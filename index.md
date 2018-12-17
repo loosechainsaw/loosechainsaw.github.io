@@ -1,37 +1,28 @@
-## Welcome to GitHub Pages
-
-You can use the [editor on GitHub](https://github.com/loosechainsaw/loosechainsaw.github.io/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
-
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/loosechainsaw/loosechainsaw.github.io/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+  1 This is going to be an old school txt blog without all the modern day flashy stuff. Mainly cause i want ppl 
+  2 to be able to read it in a terminal or a browser without all the fluff. 
+  3  
+  4 Its also going to be a live txt file which i just push up with whatever the current changes are. So it  
+  5 will evolve as I get time to work on it. 
+  6  
+  7 C++ Array Type 
+  8  
+  9 class is std::array<T, N> 
+ 10  
+ 11 Construction:  
+ 12  
+ 13 The values are allocated on the stack and are there for default constructed so the type T needs to have a default 
+ 14 constructor. 
+ 15  
+ 16 Default constructor ie std::array<int, 3> default initializes each object. ints etc have non determinate values 
+ 17                        std::array<int, 3> = {}; Zero initializes each member 
+ 18  
+ 19 Copy ctor: T and N must match. Copies each value to new array. Obviously cant just swap pointers like std::vector<> 
+ 20  
+ 21 Swap: 
+ 22 array<T,N>::swap(Array<T,N> & ) this is linear in time as pointers cant be swap and each value must be copied. 
+ 23  
+ 24 Size and Empty: 
+ 25 std::array<T,N>::size() just returns N which is how many elements the array has, since the size is fixed and  
+ 26 cannot be resized; 
+ 27 std::array<T,N>::empty() whether N == 0, ie size() = 0 and begin() would equal end() 
+ 28 
