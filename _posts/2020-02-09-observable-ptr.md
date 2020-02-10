@@ -38,8 +38,10 @@ Before we jump in for those who have not overloaded the * (dereference) and -> (
 template<typename T>
 class observable_ptr {
 public:
-    friend bool operator==(observable_ptr<T> const& lhs, observable_ptr<T> const& rhs);
-    friend bool operator!=(observable_ptr<T> const& lhs, observable_ptr<T> const& rhs);
+    friend bool operator==(observable_ptr<T> const& lhs, 
+			   observable_ptr<T> const& rhs);
+    friend bool operator!=(observable_ptr<T> const& lhs, 
+			   observable_ptr<T> const& rhs);
     explicit observable_ptr(T* ptr = nullptr)
         : ptr_{ptr}
     {
