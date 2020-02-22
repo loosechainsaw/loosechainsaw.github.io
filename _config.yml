@@ -7,14 +7,14 @@ url: "http://loosechainsaw.github.io"
 title_description: "Obscence adventures in to the lands of cpp"
 title_image: "https://www.gravatar.com/avatar/00000000000000000000000000000000?s=500&d=mm"
 google_analytics: 
-disqus_account: 
+disqus_account: blairdavidson
 github_repository: https://github.com/loosechainsaw/loosechainsaw.github.io
 addthis_id: 
 post_limit: 5
 
 # Social usernames/URLs
 twitter_username: 
-github_username:  
+github_username: loosechainsaw 
 instagram_username: 
 reddit_username: 
 linkedin_link: 
@@ -25,7 +25,7 @@ facebook_link:
 
 # Footer
 footer_left: ""
-footer_right: "&lt;/&gt; on <a href=\"https://github.com/loosechainsaw/carte-noire\">Github</a> &nbsp;<i class=\"fa fa-github-alt\"></i>"
+footer_right: "&lt;/&gt; on <a href=\"https://github.com/loosechainsaw\">Github</a> &nbsp;<i class=\"fa fa-github-alt\"></i>"
 
 # Build settings
 markdown: kramdown
