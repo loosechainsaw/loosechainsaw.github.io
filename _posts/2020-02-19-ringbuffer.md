@@ -11,8 +11,55 @@ tags:
  - Ring buffer
  - Data structures
 ---
+# Introduction
+A Ring buffer is a datastructure that is a fixed size queue which wraps around when it reaches the end. It does not need to expand when full, it simply overwrites the the oldest element. The ring buffer can be implemented as an array, with two pointers or indexes, one for the head and one for the tail. The head is where the next value will be placed and the tail is a pointer or index to the oldest element in the ring buffer. When we want to see the oldest element or front of the queue we just look at the tail. If we want to pop the front the queue we just increment the tail and decrement the size. When we want to add a new element to the ringbuffer we add it to the position of head and then increment head and the size. So what happens when we are at capacity? Well we have a design choice, overwrite the oldest element or drop the new value on the floor. The ring buffer I have developed has a template parameter to allow the user to select the desire behaviour. If you are at capacity and and the head is in the same position as the tail you overwrite the oldest element and then increment the tail, which is now the second oldest item. As the head and tail are incremented, the author of the ring buffer has to make sure the indexes or pointers do not fall off the end of the array. This is achieved by modulus with the size of the array. 
+
+# Walk through
+As an example given a Ringbuffer of size 3, lets walk through some examples so see how it works.
 
 
+{% highlight plaintext %}
+-------
+| | | | An empty ring buffer 
+-------
+^
+H/T
+-------
+|1| | | First element pushed into the ring buffer 
+-------
+ ^ ^
+ T H
+-------
+|1|2| | Second element pushed into the ring buffer 
+-------
+ ^   ^
+ T   H
+-------
+|1|2|3| Third element pushed into the ring buffer 
+-------
+ ^
+ T/ H
+
+{% endhighlight %}
+
+The ring buffer is now full. As mentioned earlier we can either, drop new elements on the floor. This is the easy case. We just check if size == capacity and return if this is true. The other case is to overwrite existing elements. Lets look at adding another element. When the fourth element is push the last element is overwriten and then the tail is bumped as is the head. As remember the head point to the next position to write to.
+
+{% highlight plaintext %}
+-------
+|4|2|3| Fourth element pushed into the ring buffer 
+-------
+   ^
+   H/T
+ 
+{% endhighlight %}
+
+# Code
+
+The ring buffer below provides the following features:
+1. Generic
+2. User can decide whether to overwrite or drop elements when full
+3. Reduces the requirements on T, T does not have to be default constructible
+4. Has iterator support
 
 {% highlight cpp %}
 
@@ -240,7 +287,11 @@ namespace buffers {
     };
 
 }
+{% endhighlight %}
 
+Below shows how the ring buffer is used.
+
+{% highlight cpp %}
 int main() {
     using namespace buffers;
     ring_buffer<std::vector<int>, 3> b1;
@@ -263,4 +314,3 @@ int main() {
 }
 
 {% endhighlight %}
-
