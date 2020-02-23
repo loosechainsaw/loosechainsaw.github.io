@@ -13,7 +13,11 @@ tags:
  - rotate
 ---
 # Introduction
-In this post we will look at rotating a datastucture like an array to the left. This means moving each element one place to the left, with the first item being moved into the last position. We basically start at the first item to the last item and copy the next element over the top. This is means at any position the value will be that of the next position. However because we copy over the top with the next element we would lose the first element if we do not store it in a temporary variable. Also we need to make sure that we stop if the next element is equal to one past the end of the array. The algorithm is a generic algorithm and is parameterized on the concept of forward iterators. This means that pretty much any stl compliant datastructure can use this algorithm.
+In this post, we will look at an algorithm which rotates a data structures elements to the left. The reader should also be able to apply what they have learn after reading this article to develop an algorithm which rotates to the right, with little effort. Rotating a data structure, like an array or vector, involves shifting each element one place to the left. The first element however will be shifted into the last position of the data structure, as the last element in the data structure has already shifted one place to the left. 
+
+The process starts at the first element and proceeds to the last element, copying the subsequent element into the current elements place, thus overwriting it. However because we overwrite the current element in each iteration, with that of the subsequent element, we need to store a temporary copy of the first element, so we can use it to replace the last element in the data structure. Special consideration also needs to be given when the last element of the data structure is reached, since we can not access the subsequent element.
+
+The rotate_left algorithm algorithm presented in this article, uses iterators, like the rest of the STL. Future articles will cover how iterators work and how to implement data structures which use iterators, which are also compatible with the STL. The ring buffer article on this site, is an example of an STL compatible data stucture, which will be used in a future article to exmplain in depth the STL requirements for data structures and iterators. Suffice for now, iterators can be considered a generalization of pointers, which allow any compatible data structure to use the STL algorithms, or algorithms designed with iterator support in mind.
 
 # Walk through
 As an example given a array of size 3, lets walk through some examples so see how it works.
@@ -67,15 +71,6 @@ TForwardIterator left_rotate(TForwardIterator begin, TForwardIterator end) {
     return last;
 }
 
-{% endhighlight %}
-
-So from the code, lets discuss. We first check if begin == end, is it empty, if so there is nothing to do so return begin. Then we store a temp of the element at begin, and set last, which refers to the actual last element in the range to begin. We then walk through the range, and check if the next elment is the end, and if so exit, otherwise we dereference the iterator and set its value to the next elements value. Also we update the last to be the current iterator. After we are done we check if the range is not empty and set the value of last to the temp value. Voila.
-
-Lets look at it in action.
-
-
-{% highlight cpp %}
-
 int main() {
 
     std::vector<int> v{1,2,3,4,5};
@@ -92,3 +87,24 @@ int main() {
     return 0;
 }
 {% endhighlight %}
+
+In the left_rotate algorithm shown above, the first point to note is that we do not need to do any work if the begin == end. The left_rotate algorithm presented return the position of the last element in the range. This useful for the caller of the algorithm as they can check if the result is equal to the end iterator. If so no rotation was performed.
+
+Secondly the algorithm stores a copy of the element at the beginning. This as mentioned previously is to ensure we do not lose a copy of this element. 
+
+We also track which iterator value is equal to that of the the last addressable element in the range. This is one before the end, as iterators model a half open interval, [begin, end), and end is one past the end of the elements. This is needed as we need to overwrite this element with a copy of temp, which is the value of the element at the beginning.
+
+The for loop, iterates through the range and until we reach the end iterator. In the body of the loop we save a copy of the iterator which represents the next position in the range. the variable last is also updated with the value of the current iterator and we exit if the next element is equal to the end iterator. This will be the actual last position in the range. Finally we update the element at the current position, start, with the value of the next iterator.
+
+When the loop completes will just need to copy the value in temp to the location which the iterator last is refering to. This only need to be done however if we actually had to step through the array, which only happens if the size of the range is greater than one. And we return last, indicated to the caller that the range is firstly not empty, and that the range has now been shifted one to the left.
+
+If we wanted to shift a range, say n to the left, this function could be wrapped in another function in a while loop and called until it has been performed n times.
+
+Just for comparision, I will present some clojure code, which is a lisp. The clojure code has been contributed by a friend of mine, [Crispin Wellington](https://github.com/retrogradeorbit), which does the equivalent, but is in my opinion really elegant. Definately shows how beautiful functional programming languages are.
+
+{% highlight clojure %}
+(defn leftrotate [[h & t]]
+  (concat t [h]))
+{% endhighlight %}
+
+Until next time.
