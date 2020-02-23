@@ -13,7 +13,9 @@ tags:
  - rotate
 ---
 # Introduction
-In this post, we will look at an algorithm which rotates a data structures elements to the left. The reader should also be able to apply what they have learn after reading this article to develop an algorithm which rotates to the right, with little effort. Rotating a data structure, like an array or vector, involves shifting each element one place to the left. The first element however will be shifted into the last position of the data structure, as the last element in the data structure has already shifted one place to the left. 
+In this post, we will look at an algorithm which rotates a data structure's elements to the left. The reader should also be able to apply what they have learnt after reading this article to develop an algorithm, which rotates a datastructure's elements to the right.
+
+Rotating a data structure, like an array or vector, involves shifting each element one place to the left. The first element however will be shifted into the last position of the data structure. The last element in the data structure has already been shifted one place to the left. 
 
 The process starts at the first element and proceeds to the last element, copying the subsequent element into the current elements place, thus overwriting it. However because we overwrite the current element in each iteration, with that of the subsequent element, we need to store a temporary copy of the first element, so we can use it to replace the last element in the data structure. Special consideration also needs to be given when the last element of the data structure is reached, since we can not access the subsequent element.
 
@@ -88,7 +90,7 @@ int main() {
 }
 {% endhighlight %}
 
-In the left_rotate algorithm shown above, the first point to note is that we do not need to do any work if the begin == end. The left_rotate algorithm presented return the position of the last element in the range. This useful for the caller of the algorithm as they can check if the result is equal to the end iterator. If so no rotation was performed.
+In the left_rotate algorithm shown above, the first point to note is that we do not need to do any work if the begin == end. The left_rotate algorithm presented returns the position of the last element in the range. This useful for the caller of the algorithm as they can check if the result is equal to the end iterator. If so no rotation was performed.
 
 Secondly the algorithm stores a copy of the element at the beginning. This as mentioned previously is to ensure we do not lose a copy of this element. 
 
