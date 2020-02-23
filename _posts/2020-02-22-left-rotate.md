@@ -1,9 +1,9 @@
 ---
 layout:     post
-title:      C++ Ring buffer
+title:      C++ Left Rotation
 date:       2020-02-22 22:19:00
 author:     Blair Davidson
-summary:    C++ Ring buffer
+summary:    C++ Left Rotation
 categories: C++
 thumbnail:  heart
 tags:
