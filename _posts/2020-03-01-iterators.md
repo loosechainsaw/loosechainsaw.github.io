@@ -1,9 +1,9 @@
 ---
 layout:     post
-title:      C++ Iterators
+title:      An Introduction into C++ Iterators (Part 1)
 date:       2020-03-01 22:19:00
 author:     Blair Davidson
-summary:    C++ Iterators
+summary:    An Introduction into C++ Iterators (Part 1)
 categories: C++
 thumbnail:  heart
 tags:
@@ -169,6 +169,7 @@ EqualityComparable. a type can be compared for equality and inequality.
 
 Iterators in the STL also form a heirarchy of concepts. Iterators the support being able to read from and moved forwards only once are input iterators. The reason for being restricted to be read from only once is the iterator might be something like a network stream, which by nature can be consumed only once. Lets examine Input Iterators in more details to see the operations which must be supported. 
 
+
 {% highlight plaintext %}
 Iterator concept:
 - Refinement of CopyConstructible
@@ -176,43 +177,340 @@ Iterator concept:
 - Refinement of Destructible
 - Refinement of Swappable
 - Has typedefs for value_type, difference_type, reference, pointer, and iterator_category
-
 InputIterator concept:
 - Refinement of Iterator
-- Suports !=
-- Suports operator++() and operator++(int). 
-- Supports operator*() and operator->()
-
+- Provide operator !=
+OutputIterator concept:
+-Can write to the current element of a iterator
+-When combined with a ForwardIterator etc, the iterator is considered mutable
+ForwardIterator concept:
+-Basically InputIterator but allows multiple passes
+BidirectionIterator
+-Refinement of ForwardIterator
+-ForwardIterator than can move in both directions
+-Supports --i
+RandomAccessIterator
+-Refinement of BidirectionalIterator
+-Can access anywhere in the underlying source in constant time
+-Supports i += n, i + n, i - n, i -= n
+-Supports i < k, i <= k, i > k, i >= k
 {% endhighlight %}
 
-Lets take our new understanding of iterators and implement that find method we spoke about at the start of the article. We can implement find() with a pair of Input Iterators and an additional template parameter to represent the value we wish to find in the range modelled by the input iterators provided. 
-
+As an example of a more sophisticated data structure, lets look at a linked list that can be traversed in a single direction, forwards. The forward_list<T> class, defines two iterator classes, forward_list_iterator and const_forward_list_iterator. Lets take a look at the code.
 
 {% highlight cpp %}
-template<class InputIt, class T>
-InputIt find(InputIt first, InputIt last, const T& value)
-{
-    for (; first != last; ++first) {
-        if (*first == value) {
-            return first;
+#include <iostream>
+
+namespace datastructures {
+
+    template<typename T>
+    class forward_list {
+    public:
+
+        using value_type = T;
+        using reference = T&;
+        using const_reference = T const&;
+        using pointer = T*;
+        using const_pointer = T const*;
+        using size_type = size_t;
+        using difference_type = ptrdiff_t ;
+
+        struct node {
+            value_type value{};
+            node* next{};
+        };
+
+        class forward_list_iterator {
+        public:
+            using value_type = T;
+            using reference = T&;
+            using const_reference = T const&;
+            using pointer = T*;
+            using const_pointer = T const*;
+            using size_type = size_t;
+            using difference_type = ptrdiff_t ;
+            using iterator_category = std::forward_iterator_tag;
+
+            forward_list_iterator() noexcept = default;
+            explicit forward_list_iterator(node* ptr)
+            : ptr_{ptr}
+            {
+            }
+            forward_list_iterator(forward_list_iterator const&) noexcept = default;
+            forward_list_iterator& operator=(forward_list_iterator const&) noexcept = default;
+            forward_list_iterator& operator++() noexcept {
+                ptr_ = ptr_->next;
+                return *this;
+            }
+            forward_list_iterator operator++(int) noexcept {
+                auto temp = *this;
+                this->operator++();
+                return temp;
+            }
+            reference operator*() noexcept {
+                return ptr_->value;
+            }
+            const_pointer operator->() noexcept {
+                return &(ptr_->value);
+            }
+            bool operator==(forward_list_iterator const& rhs) const noexcept {
+                return ptr_ == rhs.ptr_;
+            }
+            bool operator!=(forward_list_iterator const& rhs) const noexcept {
+                return ptr_ != rhs.ptr_;
+            }
+            ~forward_list_iterator() = default;
+        private:
+            node* ptr_{};
+        };
+
+        class const_forward_list_iterator {
+        public:
+            using value_type = T;
+            using reference = T&;
+            using const_reference = T const&;
+            using pointer = T*;
+            using const_pointer = T const*;
+            using size_type = size_t;
+            using difference_type = ptrdiff_t ;
+            using iterator_category = std::forward_iterator_tag;
+
+            const_forward_list_iterator() noexcept = default;
+            explicit const_forward_list_iterator(node* ptr)
+                : ptr_{ptr}
+            {
+            }
+            const_forward_list_iterator(const_forward_list_iterator const&) noexcept = default;
+            const_forward_list_iterator& operator=(const_forward_list_iterator const&) noexcept = default;
+            const_forward_list_iterator& operator++() noexcept {
+                ptr_ = ptr_->next;
+                return *this;
+            }
+            const_forward_list_iterator operator++(int) noexcept {
+                auto temp = *this;
+                this->operator++();
+                return temp;
+            }
+            const_reference operator*() noexcept {
+                return ptr_->value;
+            }
+            const_pointer operator->() noexcept {
+                return &(ptr_->value);
+            }
+            bool operator==(const_forward_list_iterator const& rhs) const noexcept {
+                return ptr_ == rhs.ptr_;
+            }
+            bool operator!=(const_forward_list_iterator const& rhs) const noexcept {
+                return ptr_ != rhs.ptr_;
+            }
+            ~const_forward_list_iterator() = default;
+        private:
+            node* ptr_{};
+        };
+
+        using iterator = forward_list_iterator;
+        using const_iterator = const_forward_list_iterator;
+
+
+        forward_list() noexcept = default;
+        forward_list(const forward_list&) = default;
+        forward_list& operator=(const forward_list&) = default;
+        forward_list(forward_list&&) noexcept;
+        forward_list& operator=(forward_list&&) noexcept;
+        void push_front(T const& v);
+        void push_front(T&& v);
+        void push_back(T const& v);
+        void push_back(T&& v);
+        void pop_front();
+        void clear();
+        iterator begin() noexcept {
+            return iterator{head_};
         }
+        iterator end() noexcept {
+            return iterator{};
+        }
+        iterator cbegin() const noexcept {
+            return const_iterator{head_};
+        }
+        iterator cend() const noexcept {
+            return const_iterator{};
+        }
+        T& front() noexcept;
+        T const& front() const noexcept;
+        T& back() noexcept;
+        T const& back() const noexcept;
+        size_t size() const noexcept;
+        bool empty() const noexcept;
+        ~forward_list();
+    private:
+        node *head_{};
+        node *tail_{};
+        size_t size_{};
+    };
+
+    template<typename T>
+    forward_list<T>::forward_list(forward_list&& rhs) noexcept
+            : head_{rhs.head_},
+              tail_{rhs.tail_},
+              size_{rhs.size_}
+    {
+        rhs.head_ = nullptr;
+        rhs.tail_ = nullptr;
+        rhs.size_ = 0;
     }
-    return last;
+
+    template<typename T>
+    forward_list<T>& forward_list<T>::operator=(forward_list&& rhs) noexcept
+    {
+        clear();
+        head_ = rhs.head_;
+        tail_ = rhs.tail_;
+        size_ = rhs.size_;
+
+        rhs.head_ = nullptr;
+        rhs.tail_ = nullptr;
+        rhs.size_ = 0;
+    }
+
+    template<typename T>
+    void forward_list<T>::push_front(const T &v)
+    {
+        head_ = new node{v, head_};
+        if(!tail_)
+            tail_ = head_;
+        ++size_;
+    }
+
+    template<typename T>
+    void forward_list<T>::push_front(T &&v) {
+        head_ = new node{std::move(v), head_};
+        if(!tail_)
+            tail_ = head_;
+        ++size_;
+    }
+
+    template<typename T>
+    void forward_list<T>::push_back(const T &v) {
+        auto n =  new node{v, nullptr};
+        if(!tail_) {
+            tail_ = n;
+        }else{
+            tail_->next = n;
+            tail_= tail_->next;
+        }
+        ++size_;
+    }
+
+    template<typename T>
+    void forward_list<T>::push_back(T&& v) {
+        auto n =  new node{std::move(v), nullptr};
+        if(!tail_) {
+            tail_ = n;
+        }else{
+            tail_->next = n;
+            tail_= tail_->next;
+        }
+        ++size_;
+    }
+
+    template<typename T>
+    void forward_list<T>::pop_front() {
+        if(empty()) return;
+
+        auto next = head_->next;
+        delete head_;
+        head_ = next;
+
+        if(head_ == nullptr)
+            tail_ = head_;
+        --size_;
+    }
+
+    template<typename T>
+    void forward_list<T>::clear() {
+
+        auto p = head_;
+
+        while(p != nullptr) {
+            auto t = p->next;
+            delete p;
+            p = t;
+        }
+        size_ = 0;
+    }
+
+    template<typename T>
+    bool forward_list<T>::empty() const noexcept {
+        return head_ == nullptr;
+    }
+
+    template<typename T>
+    forward_list<T>::~forward_list() {
+        clear();
+    }
+
+    template<typename T>
+    size_t forward_list<T>::size() const noexcept {
+        return size_;
+    }
+
+    template<typename T>
+    T &forward_list<T>::front() noexcept {
+        return head_->value;
+    }
+
+    template<typename T>
+    T const &forward_list<T>::front() const noexcept {
+        return head_->value;
+    }
+
+    template<typename T>
+    T &forward_list<T>::back() noexcept {
+        return tail_->value;
+    }
+
+    template<typename T>
+    T const &forward_list<T>::back() const noexcept {
+        return tail_->value;
+    }
 }
+
+int main() {
+
+    datastructures::forward_list<int> v;
+
+    for(auto i = 0; i < 10; ++i){
+        v.push_front(i);
+    }
+
+    datastructures::forward_list<int> z {std::move(v)};
+
+    for(size_t i = 0, size = z.size(); i < size; ++i){
+        std::cout << z.front() << "\n";
+        z.pop_front();
+    }
+
+    std::cout << "================================\n";
+
+    for(auto i = 0; i < 10; ++i){
+        v.push_front(i);
+    }
+    
+    std::for_each(std::begin(v), std::end(v), [](int z) {
+        std::cout << z << "\n";
+    });
+
+    std::cout << std::endl;
+
+    return 0;
+}
+
 {% endhighlight %}
 
-Lets examine find(). It loops through the range, incrementing the iterator at each pass and checks if the value matches the supplied value and returns the position of the iterator if a match occurs. Otherwise it returns the end, which indicates we did not find anything.
+The first thing we can observe it we define the iterators dereference operator, operator*() in terms of returning a reference to the value field of node structure. Secondly the arrow operator, operator->() is defined in terms of returning a pointer to the value field of node structure. This is important as when an algorithm, such as std::find need a value from the iterator we return the correct value for use in the algorithm. Also the prefix operator, operator++() is defined in terms of updating the the ptr to the current node to node->next. This is the logically way for the iterator of a list class to move through its collection of nodes. Finally we define equality, operator==() and inequality, operator!=() in terms of comparing node pointers. This again makes sense as we stop when we hit the end iterators address, which is nullptr, which matches how we would do this if we just wrote an algorithm to walk a list.
 
-So far you maybe scratching your head as to why bother with iterators. I mean i we have done is provide pointers. Well lets create our own linked list class with only links to the next node. We can only move forwards.
+The iterators also define a typedef iterator_category. This is a requirement for iterators. This lets algorithms know what the iterator supports in terms of requirements. Algorithms can be customised to use more efficent algorithms if the iterator supports them. For example std::random_access_iterator_tag supports more operators then std::forward_iterator_tag. 
 
-{% highlight cpp %}
-
-{% endhighlight %}
-
-I dont want to explain how a linked list works, but lets examine the iterator class it provides. The first thing to noice is the implementation of operator++(). It updates the element that the iterator pointers to by moving to the next node with element_ = element_->next; It also works like how the traditional prefix unary ++ operator works. It updates the value immediately and returns a reference to that value. The operator(int) models the postfix operator, thus it makes a copy of itself first and then updates itself and returns a the old version of itself.
-
-The iterator also implements the operator*() and operator->() functions. The operator*() works by returning a reference to the actual value contained in the node pointed to by element_, whilst operator->() returns a pointer to the object contained in the node structure.
-
-To see how the range of elements presented by the linked list are navigatible. Look at what begin() and end() return. begin() return the pointer contained in head_, whilst end() return nullptr. This makes sense when you think about how an algorithm like find() works. It has to stop when we get to end(), which is what the first != last check serves. It also needs to move through the data structure providing the iterators, which is what ++first does. Remember it just moves forward with element_ = element_->next; Finally it has to check if the value matches the supplied value. We have this with our operator*() implementation which returns the value contained in the node structure by reference.
+So this wraps up our introduction into iterators. I hope this helps. In the following article on iterators we will discuss iterator_traits. But before then there will be additional articles on the prerequisites such as template specialization and traits.
 
 Until next time.
