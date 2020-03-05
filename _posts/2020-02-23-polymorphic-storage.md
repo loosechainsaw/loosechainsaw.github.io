@@ -13,9 +13,9 @@ tags:
  - Buffers
 ---
 # Introduction
-In this post, we will look at creating a polymorphic storage buffer. This is a class which has an array of bytes, which can store any number of derived types of a given base type over the course of the program.
+In this post, we will look at creating a polymorphic storage buffer. This is a class which uses an array bytes to store a user specified number of types,  which are derived from a user specified base type. The contents of the buffer in the storage class can change over the course of the program.
 
-As the polymorphic buffer can store objects of various sizes, the storage provided must be the size of the of the largest type. Also the storage must be aligned to that of the type with the largest alignment requirement. There are two two traits, max_size and max_alignment, which are variadic templates which obviously finds the the max size and alignment of the list of types provided. The storage used is that of std::aligned_storage, which provides a nested typedef called type which is of the provided size and alignment.
+As the polymorphic buffer can store objects of various sizes, the storage provided must be the size of the of the largest type. Also the storage must be aligned to that of the type with the largest alignment requirement. There are two two traits, max_size and max_alignment, which are variadic templates which obviously finds the the max size and alignment of the list of types provided. The storage used is that of std::aligned_storage, which provides a nested typedef called type which is of the provided size and alignment. 
 
 The library also provides support for std::unique_ptr. The benefit of this is that it is guaranteed to destroy the constructed type when the unique_ptr either goes out of scope or is reset. This also helps make the users code base exception safe and much simpler.
 
@@ -182,5 +182,8 @@ int main() {
 }
 
 {% endhighlight %}
+
+# Discussion
+The example program above use a heirarchy of shape classes which can be stored in the polymorphic buffer. The first type parameter of the buffer is the base type, which is shape in the example, and the second type parameter is a variadic type, which contains a list of derived types of shape. These are circle, square and rectangle. The buffer storage value can change over the course of the program and we manage the lifetime of the derived type with a std::unique_ptr which has a custom deleter. If you are in an embedded environment a type like this can be useful as you often are not permitted to use the heap. You just need to be careful around swapping the contents of the buffer and having an old std::unique_ptr around which thinks it is pointing to something else. Beware.
 
 Until next time.
